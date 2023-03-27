@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width-device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Animix</title>
+    <link rel="stylesheet" href="shah.css">
+    <script src="https://kit.fontawesome.com/13257e781f.js" crossorigin="anonymous"></script>
+
+</head>
+
+
+<body>
+    <div id="background" style="background-image: url('media/background1.jpg');"></div>
+
+    <div class="container">
+        <div class="music-player">
+            <nav>
+                <div class="circle" onclick="back()">
+                    <i class="fa-solid fa-angle-left"></i>
+                </div>
+                <div class="circle" onclick="setting()">
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+                <div class="soundlogo">
+                    <i class="fa-solid fa-volume-high"></i>
+                </div>
+            </nav>
+            <img src="media/takagi.jpg" class="song-img ">
+            <h1>Chiisana Koi No Uta</h1>
+            <p>Takagi San</p>
+
+            <audio id="song">
+                <source src="media/Chiisana Koi no Uta.mp3" type="audio/mpeg">
+
+            </audio>
+            <audio id="songs">
+                <source src="media/Ai Uta.mp3" type="audio/mpeg">
+            </audio>
+
+            <input type="range" value="0" id="progress">
+
+            <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5" id="volume">
+
+            <div class="controls">
+                <div onclick="previous()"><i class="fa-solid fa-backward"></i></div>
+                <div onclick="playPause()"><i class="fa-solid fa-play" id="ctrlIcon"></i></div>
+
+                <div onclick="nexts()"><i class="fa-solid fa-forward" id="button"></i></div>
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+    <script>
+        let songs = [
+            {
+                title: 'Chiisana Koi No Uta',
+                artist: 'Takagi San',
+                source: 'media/Chiisana Koi no Uta.mp3',
+                songImage: 'media/takagi.jpg',
+                background: 'media/background1.jpg',
+            },
+            {
+                title: 'Ai Uta',
+                artist: 'Koda Kumi',
+                source: 'media/Ai Uta.mp3',
+                songImage: 'media/takagi 2.jpg',
+                background: 'media/back2.jpg'
+            },
+            {
+                title: 'Deatta Koro no Youni',
+                artist: 'Rie Takahashi',
+                source: 'media/Rie Takahashi - Deatta Koro no Youni.mp3',
+                songImage: 'media/background3.jfif',
+                background: 'media/takagi 3.jpg'
+
+            }
+
+        ];
+
+        const audio = document.getElementById("song");
+        const volumeControl = document.getElementById("volume");
+
+        volumeControl.addEventListener("input", function () {
+            song.volume = volumeControl.value;
+        });
+
+
+
+        let pointerIndex = 0;
+        let progress = document.getElementById("progress")
+        let song = document.getElementById("song")
+        let ctrlIcon = document.getElementById("ctrlIcon")
+        let button = document.getElementById("button")
+        let songImage = document.querySelector(".song-img");
+
+
+
+        song.onloadedmetadata = function () {
+            progress.max = song.duration;
+            progress.value = song.currentTime
+        }
+
+
+
+        progress.addEventListener('input', function () {
+            song.currentTime = progress.value;
+        });
+
+
+        progress.addEventListener('change', function () {
+            if (song.currentTime >= progress.value) {
+                document.querySelector('.song-img').style.animationPlayState = "running";
+            } else {
+                document.querySelector('.song-img').style.animationPlayState = "running";
+            }
+        });
+
+        if (song.play()) {
+            setInterval(() => {
+                progress.value = song.currentTime;
+            }, 0);
+        }
+
+        progress.onchange = function () {
+            song.play();
+            song.currentTime = progress.value;
+            ctrlIcon.classList.add("fa-pause");
+            ctrlIcon.classList.remove("fa-play");
+            ctrlIcon.classList.remove("fa-spin");
+        }
+
+
+
+        function updateTitleAndImage() {
+            document.querySelector('h1').textContent = songs[pointerIndex].title;
+            document.querySelector('p').textContent = songs[pointerIndex].artist;
+            songImage.src = songs[pointerIndex].songImage;
+            songImage.alt = songs[pointerIndex].title + ' by ' + songs[pointerIndex].artist;
+
+
+            document.getElementById('background').style.backgroundImage = `url('${songs[pointerIndex].background}')`;
+        }
+
+
+        function playPause() {
+            if (ctrlIcon.classList.contains("fa-pause")) {
+                song.pause();
+                ctrlIcon.classList.remove("fa-pause");
+                ctrlIcon.classList.add("fa-play");
+                document.querySelector('.song-img').style.animationPlayState = "paused";
+            } else {
+                song.play();
+                ctrlIcon.classList.add("fa-pause");
+                ctrlIcon.classList.remove("fa-play");
+                document.querySelector('.song-img').style.animationPlayState = "running";
+            }
+        }
+
+        function nexts() {
+            pointerIndex++;
+            if (pointerIndex >= songs.length) {
+                pointerIndex = 0;
+            }
+            song.src = songs[pointerIndex].source;
+            song.title = songs[pointerIndex].title;
+            song.load();
+            song.play();
+            if (song.paused) {
+                ctrlIcon.classList.remove("fa-pause");
+                ctrlIcon.classList.add("fa-play");
+                document.querySelector('.song-img').style.animationPlayState = "paused";
+            } else {
+                ctrlIcon.classList.remove("fa-play");
+                ctrlIcon.classList.add("fa-pause");
+                document.querySelector('.song-img').style.animationPlayState = "running";
+            }
+
+
+            updateTitleAndImage();
+
+        }
+
+        function previous() {
+            pointerIndex--;
+            if (pointerIndex < 0) {
+                pointerIndex = songs.length - 1;
+            }
+            song.src = songs[pointerIndex].source;
+            song.title = songs[pointerIndex].title;
+            song.load();
+            song.play();
+            if (song.paused) {
+                ctrlIcon.classList.remove("fa-pause");
+                ctrlIcon.classList.add("fa-play");
+                document.querySelector('.song-img').style.animationPlayState = "paused";
+            } else {
+                ctrlIcon.classList.remove("fa-play");
+                ctrlIcon.classList.add("fa-pause");
+                document.querySelector('.song-img').style.animationPlayState = "running";
+            }
+            updateTitleAndImage();
+
+        }
+
+        song.addEventListener('ended', function () {
+            pointerIndex++;
+            if (pointerIndex >= songs.length) {
+                pointerIndex = 0;
+            }
+            updateTitleAndImage()
+            song.src = songs[pointerIndex].source;
+            song.play();
+
+
+        });
+
+
+
+
+
+
+    </script>
+
+
+
+
+</body>
+
+
+
+
+
+
+
+
+
+
+</html>
